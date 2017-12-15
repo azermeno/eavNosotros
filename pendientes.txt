@@ -1,0 +1,33 @@
+1. Subir el Login para que el teclado no lo cubra	*
+
+2. Poner Nombre de los dos!	*
+
+3. Hacer el teclado un poco más compacto de Alto	*
+
+4. Arreglar el Guardar
+
+5. Poner Automaticamente el numero de Lote + numero de Folio
+
+6. Agregar Nuevo Lote.
+   Esta usted seguro que desea agregar un nuevo lote.
+		Y te mande al nuevo lote
+			Y ahi mismo ponga automaticamente el lote del maquilador
+
+7. Solo existen dos estados  ( Esto aplicando a los filtros )	-
+	En captura
+	Finalizado
+		Tanto en lotes como en tubos.
+			
+8. Poner un enter en el teclado
+
+9. Filtrar con Tubos ( Internamente con JAVASCRIPT )	*
+
+10. Filtrar con Lotes ( Internamente con JAVASCRIPT )	*
+
+11. Verificar Ajustes visuales
+
+12. Mover boton de regresar a lotes	*
+
+13. No abrir teclado al entrar a un lote	*
+
+14. confrimación de guardar
