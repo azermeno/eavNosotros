@@ -956,8 +956,9 @@
 					if(fila.length === 0){
 						//---- agregar tubo
 						var NumeroDeTuboCapturado = $('#capturaNumeroDeTubo').val();
+						$('#capturaNumeroDeTubo').val('');
 						var PacienteCapturado = $('#CapturaPaciente').val()
-						 if(NumeroDeTuboCapturado !== '' ){ 
+						if(NumeroDeTuboCapturado !== '' ){ 
 							var claseDeFila = $("#controlfilas").val();
 							var codigo= "";
 							if(claseDeFila === '0'){
@@ -968,26 +969,32 @@
 								codigo = "<tr class='odd'>";
 								$("#controlfilas").val('0');
 							}
-							codigo += "<td class='sorting_1'>" + $('#capturaNumeroDeTubo').val() + "</td>";
-							// Wojciech Modifico Aqui
-							
+							codigo += "<td class='sorting_1'>" + NumeroDeTuboCapturado + "</td>";
 							codigo += "			<td>" + LoteGlobal+pad(FolioGlobal+1,3) + "</td>";
 							FolioGlobal = FolioGlobal + 1;
-							var varNombre = obtenPacienteAleatorio(Math.floor((Math.random() * 20)));
-							AgregarMVCTubo($('#capturaNumeroDeTubo').val(), LoteGlobal.substring(0,2), LoteGlobal.substring(2,5), pad(FolioGlobal,3), varNombre, 'En Captura', 'Agregado');							
-							var varEstudios = obtenEstudiosAleatorios();
-							codigo += "			<td>" + varNombre + "</td>";
-							codigo += "			<td>" + varEstudios + "</td>";							
-							// termina modificacion
-							codigo += "			<td>" + "En Captura" + "</td>";
+							codigo += "			<td>" + " -------- " + "</td>"; 
+							codigo += "			<td>" + " " + "</td>";
+							codigo += "			<td>" + "Solicitando a LIS <img src='imagenes/loader.gif' style='margin-top: -7px;'>" + "</td>";
 							codigo += "		</tr>";
-							codigo += "</tr>";
-							$('#tubosDeLote').prepend(codigo);							
+							var varNombre= '';
+							AgregarMVCTubo(NumeroDeTuboCapturado, LoteGlobal.substring(0,2), LoteGlobal.substring(2,5), pad(FolioGlobal,3), varNombre, 'En Captura', 'Agregado');
+							
+							EnviaPeticionLIS(NumeroDeTuboCapturado,LoteGlobal+pad(FolioGlobal,3));
+							
+							$('#tubosDeLote tbody').prepend(codigo);
+							
+							setTimeout(function(){ 
+								var estadochecar = $('table#tubosDeLote td:contains("' + NumeroDeTuboCapturado + '")').parent().find("td:nth-child(5)").html();
+								if(!estadochecar.includes('Recibido por LIS') )
+									$('table#tubosDeLote td:contains("' + NumeroDeTuboCapturado + '")').parent().find("td:nth-child(5)").html("Sin respuesta a la solicitud a LIS");
+							}, 15000);
+							
+							<!-- EnviaPeticionLIS(); -->
 							
 							<!-- $('#cerrarCapturaNuevoRegistro').trigger('click'); -->
 							$('#capturaNumeroDeTubo').val('');
 							$('#CapturaPaciente').val('');
-							$("$capturaNumeroDeTubo").focus();
+							$("#capturaNumeroDeTubo").focus();
 						}
 						else alert("Número de tubo es un campo obligatorio");
 					}
@@ -997,7 +1004,14 @@
 						fila.trigger('click');
 						$('#capturaNumeroDeTubo').val('');
 					}
-
+					$('#capturaNumeroDeTubo').focus();
+				});
+				
+				$('#capturaNumeroDeTubo').keyup(function (event) {
+					if (event.which == 13) {
+						event.preventDefault();
+						$('#agregarNuevoTubo #AceptarNuevoTubo').trigger('click');
+					}
 				});
 				
 				$('#capturaNumeroDeTubo').keyup(function (event) {
@@ -1920,6 +1934,41 @@
 			}
 			return codigo;
 		}
+		
+		unction EnviaPeticionLIS(FolioLocal,FolioMaquilador){
+			// Folio y FolioMaq
+			
+			NuevosEstados = [];
+			var estudio = null;
+			var paquete = "H|LIS|EAV$" +	  
+						  "P|" + FolioLocal  + "|" + FolioMaquilador + "$" +
+						  "L|N" ;
+						  console.log(paquete);
+			$.ajax({
+				  async:false, 
+				  method: "get",
+				  url: "php/solicitandoLis.php?FolioLIS=" + FolioLocal + "&FolioMaq=" + FolioMaquilador,
+				  dataType: "json",				  
+				}).done(function(data){					
+					  <!-- data.forEach(function(entry){						   -->
+						  <!-- var NuevoEstado = [ entry.IdUnidad, entry.IdLote , entry.IdFolio, entry.Estado, entry.EstadoM ]; -->
+					      <!-- NuevosEstados.push(NuevoEstado);		 -->
+							<!-- $('#actualizandoIcono').hide(); -->
+					   <!-- });						  -->
+					   console.log(paquete);
+					   <!-- alert("222"); -->
+					}).fail(function(error){					  
+						$('#actualizandoIcono').hide();
+						alert("Por el momento no esta disponible el servicio, intente m\u00E1s tarde " + error.toString());					  
+					});
+					var peticion = [FolioLocal,FolioMaquilador, "Esperando respuesta"]
+					if(typeof(peticionesLIS) == "undefined"){
+						peticionesLIS =[];
+					}
+					peticionesLIS.push(peticion);
+
+		}	
+		
 		// Termina modificacion
 			
 	</script>
